@@ -17,7 +17,45 @@ SR::SR() {
 }
 
 void SR::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
+    this->soc = soc;
+    this->addr = addr;
+    FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
+    uint32_t inSeqNo;
+    int base = 0;
 
+    bool rec[N];
+    Packet *datawnd[N]; // received data window
+    for (int i = 0; i < N; i++)
+        rec[i] = false;
+    do {
+        Packet *dataPkt = new DataPacket();
+        rcvUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN, false);
+        if (dataPkt->len == 0) // end of file
+            break;
+        inSeqNo = dataPkt->seqno;
+        if (inSeqNo >= base && inSeqNo < base + N) { // send ack and store it
+            rec[inSeqNo % N] = true;
+            datawnd[inSeqNo % N] = dataPkt;
+            Packet *ackPkt = new AckPacket();
+            ackPkt->len = 6;
+            ackPkt->seqno = inSeqNo;
+            sendUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN);
+        } else if (inSeqNo < base && inSeqNo >= base - N) { // resend ack
+            Packet *ackPkt = new AckPacket();
+            ackPkt->len = 6;
+            ackPkt->seqno = inSeqNo;
+            sendUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN);
+        } else { // ignore
+            continue;
+        }
+        while (rec[base % N]) { // while base is received
+            fwrite(((DataPacket*)datawnd[base%N])->data, sizeof(char), dataPkt->len, fp);
+            rec[base%N] = false;
+            base++;
+        }
+    } while (1);
+    fflush(fp);
+    fclose(fp);
 }
 
 void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
@@ -34,7 +72,7 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     uint16_t read;
     int base = 0;
     uint32_t nextSeqNo = 0;
-
+    
     // send first N packets
     while (nextSeqNo < base + N && (read = fread(buff, 1, sizeof(buff), fp)) >= 0) {
         sendPKT(buff, read, nextSeqNo);
@@ -50,7 +88,7 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     while ((read = fread(buff, 1, sizeof(buff), fp)) >= 0) {
         while (1) {
             Packet *ackPkt = new AckPacket();
-            rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN);
+            rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN, false);
             mtx1.lock();
             acked[ackPkt->seqno % N] = true;
             timer[ackPkt->seqno % N] = -1; // reset timer
@@ -71,7 +109,7 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     // if there are other packets not acked yet
     while (base != nextSeqNo) {
         Packet *ackPkt = new AckPacket();
-        rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN);
+        rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN, false);
         mtx1.lock();
         acked[ackPkt->seqno % N] = true;
         timer[ackPkt->seqno % N] = -1; // reset timer

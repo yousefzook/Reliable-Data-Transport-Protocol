@@ -24,8 +24,11 @@ public:
     virtual  void handleReciever(int soc, struct sockaddr_in addr, string fileName);
     virtual void handleSender(int soc, struct sockaddr_in addr, string fileName);
     virtual void sendUDP(Packet *p, int soc, struct sockaddr_in addr, int len);
-    virtual int rcvUDP(Packet *p, int soc, struct sockaddr_in addr, int len);
+    virtual int rcvUDP(Packet *p, int soc, struct sockaddr_in addr, int len, bool wait);
 
+private:
+    int RTT = 0.01;
+    bool isLoss();
 };
 
 

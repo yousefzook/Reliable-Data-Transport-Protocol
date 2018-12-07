@@ -7,30 +7,30 @@
 StopNWait::StopNWait() {
 }
 
-void StopNWait::handleReciever(int soc, struct sockaddr_in addr, string fileName){
-    FILE *fp = fopen(("../Client/"+fileName).c_str(), "w");
+void StopNWait::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
+    FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
     uint16_t in_seqNum = 1;
     Packet *dataPkt;
     do {
         dataPkt = new DataPacket();
-        rcvUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN);
-        if(dataPkt->seqno == in_seqNum) {
-            fwrite(((DataPacket*) dataPkt)->data, sizeof(char), dataPkt->len, fp);
+        rcvUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN, false);
+        if (dataPkt->seqno == in_seqNum) {
+            fwrite(((DataPacket *) dataPkt)->data, sizeof(char), dataPkt->len, fp);
             Packet *ackPkt = new AckPacket();
             ackPkt->len = 6;
             ackPkt->seqno = in_seqNum;
             sendUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN);
             in_seqNum++;
         }
-    }while (dataPkt->len > 0);
+    } while (dataPkt->len > 0);
     fflush(fp);
     fclose(fp);
 }
 
-void StopNWait::handleSender(   int soc, struct sockaddr_in addr, string fileName) {
+void StopNWait::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     char buff[MAX_DATA_LEN];
     memset(buff, 0, sizeof(buff));
-    FILE *fp = fopen(("../Server/"+fileName).c_str(), "r");
+    FILE *fp = fopen(("../Server/" + fileName).c_str(), "r");
     uint16_t read = 0;
     uint32_t in_seqNum = 1;
 
@@ -38,16 +38,18 @@ void StopNWait::handleSender(   int soc, struct sockaddr_in addr, string fileNam
         Packet *dataPkt = new DataPacket();
         dataPkt->len = read;
         dataPkt->seqno = in_seqNum;
-        strcpy(((DataPacket*) dataPkt)->data, buff);
+        strcpy(((DataPacket *) dataPkt)->data, buff);
+        RESEND:
         sendUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN); //todo send with probablity
-        clock_t start = clock();
         Packet *ackPkt = new AckPacket();
-        rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN);
-        if(ackPkt->seqno == in_seqNum){
+        if (rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN, true) == -1) {
+            goto RESEND; // to handle time out;
+        }
+        if (ackPkt->seqno == in_seqNum) {
             in_seqNum++;
         }
         memset(buff, 0, sizeof(buff));
-        if(read == 0)
+        if (read == 0)
             break;
     }
     fclose(fp);
