@@ -1,13 +1,17 @@
 //
-// Created by zook on 02/12/18.
+// Created by Zook on 12/4/18.
 //
 
-#include <netinet/in.h>
-#include <netdb.h>
-#include <cstring>
+
 #include "Client.h"
+#include "../rdt/StopNWait.h"
 
 
+Client::Client() {}
+
+void Client::setRDT(RDT *rdt){
+    this->rdt = rdt;
+}
 struct in_addr Client::getHostIP(string hostName) {
     struct hostent *host;
     struct in_addr **in_list;
@@ -34,44 +38,28 @@ void Client::conToserver(string hostName, int port) {
     server_add.sin_addr = getHostIP(hostName);
 }
 
-
-void Client::sendMessage(string message) {
-    int result = sendto(sockfd, message.c_str(), message.size(),
+int Client::sendFileName(string fileName) {
+    int result = sendto(sockfd, fileName.c_str(), fileName.size(),
                         MSG_CONFIRM, (const struct sockaddr *) &server_add, sizeof(server_add));
-
     if (result < 0)
-        cout << "Sending message failed!" << endl;
+        cout << "Sending file failed!" << endl;
     else
-        cout << "Message sent successfully" << endl;
-}
-
-#define MAX_LINE 1024
-
-string Client::recvMessage() {
-    char buffer[MAX_LINE];
-    int n;
-    n = recvfrom(sockfd, buffer, sizeof(buffer),
-                 MSG_WAITALL, (struct sockaddr *) &server_add, 0);
-    buffer[n] = '\0';
-    string message(buffer);
-
-    return message;
+        cout << "fileName sent successfully" << endl;
+    return result;
 }
 
 
-void Client::startClient(string hostName, int portNumber) {
+void Client::startClient(string hostName, int portNumber, string fileName) {
     conToserver(hostName, portNumber);
-    string mess = "this is client!";
-    sendMessage(mess);
-    string mess2 = recvMessage();
-    cout << mess2 << endl;
+    if(sendFileName(fileName) >= 0){
+        rdt->handleReciever(sockfd, server_add, fileName);
+    }
+
 }
 
-#define HOST_NAME "localhost"
-#define SERVER_PORT_NUM 8080
-
-int main() {
-
-    Client c;
-    c.startClient(HOST_NAME, SERVER_PORT_NUM);
+int main(){
+    Client *c = new Client();
+    c->setRDT(new StopNWait());
+    string fileName = "home.html";
+    c->startClient(HOST_NAME, CLIENT_PORT_NUM, fileName);
 }

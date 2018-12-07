@@ -1,21 +1,38 @@
 //
-// Created by zook on 02/12/18.
+// Created by Zook on 12/4/18.
 //
-
 #include<string>
 #include<iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <cstring>
+#include "../Packet/Packet.h"
 
-#ifndef TCP_NETWORK_CLIENT_H
-#define TCP_NETWORK_CLIENT_H
+
+#ifndef RDT_CLIENT_H
+#define RDT_CLIENT_H
+
+#define HOST_NAME "localhost"
+#define CLIENT_PORT_NUM 8080
+#define MAX_LINE 500
+
+
+class RDT;
 
 using namespace std;
 
 class Client {
 
-private:
+public:
+    Client();
     int sockfd;
+    void setRDT(RDT *rdt);
+    RDT *rdt;
+
+    uint32_t in_seqNum = 1;
 
     struct sockaddr_in server_add;
 
@@ -35,21 +52,16 @@ private:
      * send message to the server
      * @param message message to be send
      */
-    void sendMessage(string message);
-    /**
-     * receive message from server
-     * @return the received message
-     */
-    string recvMessage();
-
-public:
+    int sendFileName(string fileName);
     /**
      * Start server
      * @param portNumber server port number
      * @param hostName host name
      */
-    void startClient(string hostName, int portNumber);
+    void startClient(string hostName, int portNumber, string fileName);
+
+
 };
 
 
-#endif //TCP_NETWORK_CLIENT_H
+#endif //RDT_CLIENT_H

@@ -1,10 +1,17 @@
 //
-// Created by zook on 02/12/18.
+// Created by Zook on 12/4/18.
 //
 
+
 #include "Server.h"
-#include <arpa/inet.h>
-#include <cstring>
+#include "../rdt/RDT.h"
+#include "../rdt/StopNWait.h"
+
+Server::Server() {}
+
+void Server::setRDT(RDT *rdt) {
+    this->rdt = rdt;
+}
 
 void Server::createSocketFD() {
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
@@ -31,46 +38,31 @@ void Server::bindServer(int portno) {
 
 }
 
-
-void Server::sendMessage(string message) {
-
-    int result = sendto(sockfd, message.c_str(), message.size(),
-                        MSG_CONFIRM, (const struct sockaddr *) &cli_addr, sizeof(cli_addr));
-    if (result < 0)
-        cout << "Sending message failed!" << endl;
-    else
-        cout << "Message sent successfully" << endl;
-}
-
-#define MAX_LINE 1024
-
-string Server::recvMessage() {
-
+string Server::rcvFileName() {
+    struct sockaddr_in cli_addr;
     memset(&cli_addr, 0, sizeof(cli_addr));
     char buffer[MAX_LINE];
-    int n;
-    n = recvfrom(sockfd, (char *) buffer, MAX_LINE,
-                 MSG_WAITALL, (struct sockaddr *) &cli_addr, 0);
+    memset(buffer, 0, sizeof(buffer));
+    size_t n;
+    socklen_t len = sizeof(struct sockaddr_in);
+    n = recvfrom(sockfd, (char *) buffer, MAX_LINE,MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
     buffer[n] = '\0';
-    string message(buffer);
-
+    string message = buffer;
+    rdt->handleSender(sockfd, cli_addr, message);
     return message;
 }
 
 void Server::startServer(int port) {
-
     createSocketFD();
     bindServer(port);
-    string mess = recvMessage();
-    cout << mess << endl;
-    sendMessage("this is server");
+    rcvFileName();
 
 }
 
 
-#define PORT_NUMBER 8080
-
 int main() {
     Server *server = new Server();
+    server->setRDT(new StopNWait());
     server->startServer(PORT_NUMBER);
+
 }
