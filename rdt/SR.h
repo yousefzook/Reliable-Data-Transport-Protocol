@@ -27,12 +27,15 @@ public:
 
     void sendPKT(Packet *pkt);
 
+    /**
+     * next 3 functions are for congestion control purpose
+     */
     void increaseN();
     void decreaseN();
+    void rebuildArrs(int n);
 
 private:
     void sendPKT(char data[], uint16_t len, int seqNo);
-    void rebuildArrs(int n);
     int soc;
     struct sockaddr_in addr;
 };
