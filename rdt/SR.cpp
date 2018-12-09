@@ -49,8 +49,8 @@ void SR::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
             continue;
         }
         while (rec[base % N]) { // while base is received
-            fwrite(((DataPacket*)datawnd[base%N])->data, sizeof(char), dataPkt->len, fp);
-            rec[base%N] = false;
+            fwrite(((DataPacket *) datawnd[base % N])->data, sizeof(char), dataPkt->len, fp);
+            rec[base % N] = false;
             base++;
         }
     } while (1);
@@ -58,21 +58,64 @@ void SR::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
     fclose(fp);
 }
 
+void SR::increaseN() {
+    mtx1.lock();
+    rebuildArrs(N + 1);
+    mtx1.unlock();
+}
+
+void SR::decreaseN() {
+
+    mtx1.lock();
+    if (N == 1) {
+        mtx1.unlock();
+        return;
+    }
+    rebuildArrs(N / 2);
+    mtx1.unlock();
+}
+
+void SR::rebuildArrs(int n) {
+    Packet **pktTemp = packets;
+    bool *ackTemp = acked;
+    clock_t *tTemp = timer;
+    // reinitialize arrays
+    packets = new Packet *[n];
+    acked = new bool[n];
+    timer = new clock_t[n];
+    // copy old values
+    for (int i = 0; i < N; i++) {
+        packets[i] = pktTemp[i];
+        acked[i] = ackTemp[i];
+        timer[i] = tTemp[i];
+    }
+    acked[n - 1] = false;
+    timer[n - 1] = -1;
+}
+
 void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
 
     this->soc = soc;
     this->addr = addr;
     char buff[MAX_DATA_LEN];
+
+    // initialize arrays
+    this->packets = new Packet *[N];
+    this->acked = new bool[N];
+    this->timer = new clock_t[N];
+
+    FILE *fp = fopen(("../Server/" + fileName).c_str(), "r");
+    uint32_t nextSeqNo = 0;
+    int base = 0;
+    SEND: // for congs control purpose, when N is increased
+//    int incN = 0; // +1 for each ack
     memset(buff, 0, sizeof(buff));
     for (int i = 0; i < N; i++)
         acked[i] = false;
 
 
-    FILE *fp = fopen(("../Server/" + fileName).c_str(), "r");
     uint16_t read;
-    int base = 0;
-    uint32_t nextSeqNo = 0;
-    
+
     // send first N packets
     while (nextSeqNo < base + N && (read = fread(buff, 1, sizeof(buff), fp)) >= 0) {
         sendPKT(buff, read, nextSeqNo);
@@ -87,9 +130,14 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     // if there are other packets to send
     while ((read = fread(buff, 1, sizeof(buff), fp)) >= 0) {
         while (1) {
+            RECV: // for congs control purpose, when N is decreased
             Packet *ackPkt = new AckPacket();
             rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN, false);
             mtx1.lock();
+            if (ackPkt->seqno >= base + N) { // for congs control purpose
+                mtx1.unlock();
+                continue; // skip this packet
+            }
             acked[ackPkt->seqno % N] = true;
             timer[ackPkt->seqno % N] = -1; // reset timer
             // shift base and send new packet
@@ -103,6 +151,8 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
                 break;
             } else
                 mtx1.unlock();
+            increaseN(); // additive increase window size, for congs control purpose
+            goto SEND; // there is new slot in window, so go to send
         }
     }
 
@@ -117,10 +167,12 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
             base++;
         }
         mtx1.unlock();
+        increaseN(); // additive increase window size, for congs control purpose
+        goto SEND; // there is new slot in window, so go to send
     }
-
+//    N += incN; // additive increase window size, for congs control purpose
+//    N = N == 1 ? 1 : N / 2; // multiplicative decrease, for congs control purpose
     timerThread.join();
-
 
 }
 
@@ -144,6 +196,7 @@ void SR::sendPKT(Packet *pkt) {
 
 void timerFn(SR *sr) {
     while (1) {
+        RECHECK:
         bool isFinished = true;
         for (int i = 0; i < sr->N; i++) {
             mtx1.lock();
@@ -153,11 +206,15 @@ void timerFn(SR *sr) {
             }
             isFinished = false; // there are some pkts not acked yet
             double time = (clock() - sr->timer[i]) / (CLOCKS_PER_SEC / 1000);
-            if (!sr->acked[i] && time > sr->timeout) { //resend
+            if (!sr->acked[i] && time > sr->timeout) { // timeout, resend
                 mtx2.lock();
                 sr->sendPKT(sr->packets[i]);
                 mtx2.unlock();
                 sr->timer[i] = clock(); // restart timer
+                sr->decreaseN();
+                goto RECHECK;
+//                isFinished = true; // exit the thread
+//                break;
             }
             mtx1.unlock();
         }

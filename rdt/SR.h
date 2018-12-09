@@ -6,6 +6,7 @@
 #define RDT_SR_H
 
 
+#include <vector>
 #include "RDT.h"
 
 class SR : public RDT {
@@ -13,11 +14,12 @@ public:
     SR();
 
     int const timeout = 500; //time out after 500 ms
-    int const N = 50; // window size
 
-    clock_t timer[N];
-    Packet *packets[N];
-    bool acked[N];
+    int N = 1; // window size
+
+    clock_t timer[];
+    Packet *packets[];
+    bool acked[];
 
     void handleReciever(int soc, struct sockaddr_in addr, string fileName) override;
 
@@ -25,8 +27,12 @@ public:
 
     void sendPKT(Packet *pkt);
 
+    void increaseN();
+    void decreaseN();
+
 private:
     void sendPKT(char data[], uint16_t len, int seqNo);
+    void rebuildArrs(int n);
     int soc;
     struct sockaddr_in addr;
 };
