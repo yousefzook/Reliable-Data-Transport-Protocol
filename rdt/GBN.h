@@ -11,7 +11,7 @@
 class GBN : public RDT{
 public:
     int const N = 50; // window size
-    Packet *packets[N];
+    Packet *packets[50];
     void handleReciever(int soc, struct sockaddr_in addr, string fileName) override;
 
     void handleSender(int soc, struct sockaddr_in addr, string fileName) override;

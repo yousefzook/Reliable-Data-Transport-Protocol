@@ -17,9 +17,9 @@ public:
 
     int N = 1; // window size
 
-    clock_t timer[];
-    Packet *packets[];
-    bool acked[];
+    clock_t *timer;
+    Packet **packets;
+    bool *acked;
 
     void handleReciever(int soc, struct sockaddr_in addr, string fileName) override;
 

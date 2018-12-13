@@ -3,6 +3,7 @@
 //
 
 
+#include <SR.h>
 #include "Server.h"
 #include "../rdt/RDT.h"
 #include "../rdt/StopNWait.h"
@@ -62,7 +63,7 @@ void Server::startServer(int port) {
 
 int main() {
     Server *server = new Server();
-    server->setRDT(new StopNWait());
+    server->setRDT(new SR());
     server->startServer(PORT_NUMBER);
 
 }

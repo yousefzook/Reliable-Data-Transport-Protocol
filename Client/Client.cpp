@@ -3,6 +3,7 @@
 //
 
 
+#include <SR.h>
 #include "Client.h"
 #include "../rdt/StopNWait.h"
 
@@ -59,7 +60,7 @@ void Client::startClient(string hostName, int portNumber, string fileName) {
 
 int main(){
     Client *c = new Client();
-    c->setRDT(new StopNWait());
-    string fileName = "home.html";
+    c->setRDT(new SR());
+    string fileName = "test.txt";
     c->startClient(HOST_NAME, CLIENT_PORT_NUM, fileName);
 }
