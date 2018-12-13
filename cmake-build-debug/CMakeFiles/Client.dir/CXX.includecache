@@ -1,0 +1,142 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../Packet/AckPacket.h
+Packet.h
+../Packet/Packet.h
+
+../Packet/DataPacket.h
+Packet.h
+../Packet/Packet.h
+
+../Packet/Packet.h
+cstdint
+-
+
+/home/zook/CLionProjects/TCP Network/Client/Client.cpp
+Client.h
+/home/zook/CLionProjects/TCP Network/Client/Client.h
+../rdt/StopNWait.h
+/home/zook/CLionProjects/TCP Network/rdt/StopNWait.h
+
+/home/zook/CLionProjects/TCP Network/Client/Client.h
+string
+-
+iostream
+-
+stdlib.h
+-
+stdio.h
+-
+netdb.h
+-
+netinet/in.h
+-
+netdb.h
+-
+cstring
+-
+../Packet/Packet.h
+/home/zook/CLionProjects/TCP Network/Packet/Packet.h
+
+/home/zook/CLionProjects/TCP Network/Packet/AckPacket.cpp
+AckPacket.h
+/home/zook/CLionProjects/TCP Network/Packet/AckPacket.h
+
+/home/zook/CLionProjects/TCP Network/Packet/AckPacket.h
+Packet.h
+/home/zook/CLionProjects/TCP Network/Packet/Packet.h
+
+/home/zook/CLionProjects/TCP Network/Packet/DataPacket.cpp
+cstring
+-
+DataPacket.h
+/home/zook/CLionProjects/TCP Network/Packet/DataPacket.h
+
+/home/zook/CLionProjects/TCP Network/Packet/DataPacket.h
+Packet.h
+/home/zook/CLionProjects/TCP Network/Packet/Packet.h
+
+/home/zook/CLionProjects/TCP Network/Packet/Packet.cpp
+Packet.h
+/home/zook/CLionProjects/TCP Network/Packet/Packet.h
+
+/home/zook/CLionProjects/TCP Network/Packet/Packet.h
+cstdint
+-
+
+/home/zook/CLionProjects/TCP Network/rdt/GBN.cpp
+mutex
+-
+cstring
+-
+DataPacket.h
+-
+AckPacket.h
+-
+GBN.h
+/home/zook/CLionProjects/TCP Network/rdt/GBN.h
+
+/home/zook/CLionProjects/TCP Network/rdt/GBN.h
+RDT.h
+/home/zook/CLionProjects/TCP Network/rdt/RDT.h
+
+/home/zook/CLionProjects/TCP Network/rdt/RDT.cpp
+RDT.h
+/home/zook/CLionProjects/TCP Network/rdt/RDT.h
+
+/home/zook/CLionProjects/TCP Network/rdt/RDT.h
+stdio.h
+-
+iostream
+-
+unistd.h
+-
+stdlib.h
+-
+netinet/in.h
+-
+string
+-
+../Packet/Packet.h
+/home/zook/CLionProjects/TCP Network/Packet/Packet.h
+
+/home/zook/CLionProjects/TCP Network/rdt/SR.cpp
+cstring
+-
+DataPacket.h
+-
+AckPacket.h
+-
+thread
+-
+mutex
+-
+SR.h
+/home/zook/CLionProjects/TCP Network/rdt/SR.h
+
+/home/zook/CLionProjects/TCP Network/rdt/SR.h
+vector
+-
+RDT.h
+/home/zook/CLionProjects/TCP Network/rdt/RDT.h
+
+/home/zook/CLionProjects/TCP Network/rdt/StopNWait.cpp
+StopNWait.h
+/home/zook/CLionProjects/TCP Network/rdt/StopNWait.h
+
+/home/zook/CLionProjects/TCP Network/rdt/StopNWait.h
+cstring
+-
+DataPacket.h
+/home/zook/CLionProjects/TCP Network/rdt/DataPacket.h
+AckPacket.h
+/home/zook/CLionProjects/TCP Network/rdt/AckPacket.h
+RDT.h
+/home/zook/CLionProjects/TCP Network/rdt/RDT.h
+

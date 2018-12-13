@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++11 -pthread -g   CMakeFiles/Client.dir/Client/Client.cpp.o CMakeFiles/Client.dir/Packet/AckPacket.cpp.o CMakeFiles/Client.dir/Packet/DataPacket.cpp.o CMakeFiles/Client.dir/Packet/Packet.cpp.o CMakeFiles/Client.dir/rdt/RDT.cpp.o CMakeFiles/Client.dir/rdt/SR.cpp.o CMakeFiles/Client.dir/rdt/StopNWait.cpp.o CMakeFiles/Client.dir/rdt/GBN.cpp.o  -o Client 
