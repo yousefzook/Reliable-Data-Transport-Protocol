@@ -45,7 +45,7 @@ int Client::sendFileName(string fileName) {
     if (result < 0)
         cout << "Sending file failed!" << endl;
     else
-        cout << "fileName sent successfully" << endl;
+        cout << fileName << " sent successfully" << endl;
     return result;
 }
 
