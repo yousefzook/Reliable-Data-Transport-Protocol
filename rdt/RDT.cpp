@@ -36,9 +36,8 @@ int RDT::rcvUDP(Packet *p, int soc, struct sockaddr_in addr, int len, bool wait)
 bool RDT::isLoss() {
     srand(time(0));
     int randNum = rand() % 100 + 1;
-    int prob = 1; // this number is the probability to make loss, from 0 to 100
+    int prob = 0; // this number is the probability to make loss, from 0 to 100
     if (randNum <= prob){
-        cout << "here" << endl;
         return true;
     }
     else

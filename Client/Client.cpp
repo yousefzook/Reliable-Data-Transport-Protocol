@@ -6,15 +6,17 @@
 #include <SR.h>
 #include <GBN.h>
 #include <Server.h>
+#include <climits>
 #include "Client.h"
 #include "../rdt/StopNWait.h"
 
 
 Client::Client() {}
 
-void Client::setRDT(RDT *rdt){
+void Client::setRDT(RDT *rdt) {
     this->rdt = rdt;
 }
+
 struct in_addr Client::getHostIP(string hostName) {
     struct hostent *host;
     struct in_addr **in_list;
@@ -54,15 +56,15 @@ int Client::sendFileName(string fileName) {
 
 void Client::startClient(string hostName, int portNumber, string fileName) {
     conToserver(hostName, portNumber);
-    if(sendFileName(fileName) >= 0){
+    if (sendFileName(fileName) >= 0) {
         rdt->handleReciever(sockfd, server_add, fileName);
     }
 
 }
 
-int main(){
+int main() {
     Client *c = new Client();
-    c->setRDT(new SR());
+    c->setRDT(new StopNWait());
     string fileName = "2";
     c->startClient(HOST_NAME, CLIENT_PORT_NUM, fileName);
 }

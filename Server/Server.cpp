@@ -65,6 +65,6 @@ void Server::startServer(int port) {
 
 int main() {
     Server *server = new Server();
-    server->setRDT(new SR());
+    server->setRDT(new StopNWait());
     server->startServer(PORT_NUMBER);
 }

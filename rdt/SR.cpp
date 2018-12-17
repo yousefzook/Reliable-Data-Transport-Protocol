@@ -26,7 +26,7 @@ void SR::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
 
     this->soc = soc;
     this->addr = addr;
-    FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
+    FILE *fp = fopen(("../Client/" + fileName).c_str(), "wb");
     uint32_t inSeqNo;
     int base = 0;
     char temp[3];
@@ -75,6 +75,7 @@ void SR::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
 void SR::increaseN() {
     mtx1.lock();
     rebuildArrs(N + 1);
+    N += 1;
     mtx1.unlock();
 }
 
@@ -86,6 +87,7 @@ void SR::decreaseN() {
         return;
     }
     rebuildArrs(N / 2);
+    N /= 2;
     mtx1.unlock();
 }
 
@@ -107,21 +109,21 @@ void SR::rebuildArrs(int n) {
     timer[n - 1] = -1;
 }
 
-void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
-
+void SR::initSender(int soc, struct sockaddr_in addr, string fileName) {
     this->soc = soc;
     this->addr = addr;
-    char buff[MAX_DATA_LEN];
 
     // initialize arrays
     this->packets = new Packet *[N];
     this->acked = new bool[N];
     this->timer = new clock_t[N];
 
-    FILE *fp = fopen(("../Server/" + fileName).c_str(), "r");
-    uint32_t nextSeqNo = 0;
-    int base = 0;
-    SEND: // for congs control purpose, when N is increased
+    fp = fopen(("../Server/" + fileName).c_str(), "rb");
+    nextSeqNo = 0;
+    base = 0;
+}
+
+void SR::sendFile(int soc, struct sockaddr_in addr, string fileName) {
     memset(buff, 0, sizeof(buff));
     for (int i = 0; i < N; i++)
         acked[i] = false;
@@ -131,7 +133,7 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     // send first N packets
     while (nextSeqNo < base + N && (read = fread(buff, 1, sizeof(buff), fp)) >= 0) {
         sendPKT(buff, read, nextSeqNo);
-        cout << "packett #" << nextSeqNo << " sent!" << endl;
+        cout << "packet #" << nextSeqNo << " sent!" << endl;
         timer[nextSeqNo] = clock();
         nextSeqNo++;
     }
@@ -170,7 +172,7 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
                 mtx1.unlock();
 
             increaseN(); // additive increase window size, for congs control purpose
-            goto SEND; // there is new slot in window, so go to send
+            sendFile(soc, addr, fileName); // there is new slot in window, so go to send
         }
 
     }
@@ -189,8 +191,6 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
                 break;
         }
         mtx1.unlock();
-//        increaseN(); // additive increase window size, for congs control purpose
-//        goto SEND; // there is new slot in window, so go to send
     }
 
     timerThread.join();
@@ -199,6 +199,11 @@ void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     Packet *dataPkt = new DataPacket();
     dataPkt->len = 0;
     sendUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN);
+}
+
+void SR::handleSender(int soc, struct sockaddr_in addr, string fileName) {
+    initSender(soc, addr, fileName);
+    sendFile(soc, addr, fileName);
 }
 
 
@@ -214,9 +219,8 @@ void SR::sendPKT(char data[], uint16_t len, int seqNo) {
 }
 
 void SR::sendPKT(Packet *pkt) {
-    mtx2.lock();
+    cout << "resending ....... " << endl;
     sendUDP(pkt, soc, addr, sizeof(*pkt));
-    mtx2.unlock();
 }
 
 void timerFn(SR *sr) {
@@ -232,11 +236,13 @@ void timerFn(SR *sr) {
             isFinished = false; // there are some pkts not acked yet
             double time = (clock() - sr->timer[i]) / (CLOCKS_PER_SEC / 1000);
             if (!sr->acked[i] && time > sr->timeout) { // timeout, resend
-                cout << "resending " <<  sr->packets[i]->seqno << " .." << endl;
                 mtx2.lock();
+                cout << "resending " << sr->packets[i]->seqno << " .." << endl;
                 sr->sendPKT(sr->packets[i]);
+                cout << "resending done" << endl;
                 mtx2.unlock();
                 sr->timer[i] = clock(); // restart timer
+                mtx1.unlock();
                 sr->decreaseN();
                 goto RECHECK;
             }

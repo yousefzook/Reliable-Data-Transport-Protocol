@@ -10,14 +10,11 @@
 
 void GBN::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
 
-    FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
+    FILE *fp = fopen(("../Client/" + fileName).c_str(), "wb");
     uint32_t expectedSeqNo = 0; // expected seqno
-    int temp = 0;
     do {
         Packet *dataPkt = new DataPacket();
         rcvUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN, false);
-        temp += dataPkt->len;
-        cout << temp << endl;
         if (dataPkt->len == 0) // end of file
             break;
         if (dataPkt->seqno == expectedSeqNo) { // send ack and write packet
@@ -45,7 +42,7 @@ void GBN::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     uint32_t lastAcked = -1;
 
 
-    FILE *fp = fopen(("../Server/" + fileName).c_str(), "r");
+    FILE *fp = fopen(("../Server/" + fileName).c_str(), "rb");
     char buff[MAX_DATA_LEN];
     memset(buff, 0, sizeof(buff));
     uint16_t read;
@@ -92,6 +89,11 @@ void GBN::handleSender(int soc, struct sockaddr_in addr, string fileName) {
         lastAcked = base; // set last acked packet = base
         base++;
     }
+
+    cout << "sending empty packet" << endl;
+    Packet *dataPkt = new DataPacket();
+    dataPkt->len = 0;
+    sendUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN);
 
 
 }

@@ -12,10 +12,16 @@ using namespace std::chrono;
 StopNWait::StopNWait() {
 }
 
+//char StopNWait::checkSum(char data[]){
+//    for(int i =  0 ; i < sizeof(data); i++){
+//
+//    }
+//}
+
 void StopNWait::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-    FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
+    FILE *fp = fopen(("../Client/" + fileName).c_str(), "wb");
     uint16_t in_seqNum = 1;
     Packet *dataPkt;
     do {
@@ -40,7 +46,7 @@ void StopNWait::handleReciever(int soc, struct sockaddr_in addr, string fileName
 void StopNWait::handleSender(int soc, struct sockaddr_in addr, string fileName) {
     char buff[MAX_DATA_LEN];
     memset(buff, 0, sizeof(buff));
-    FILE *fp = fopen(("../Server/" + fileName).c_str(), "r");
+    FILE *fp = fopen(("../Server/" + fileName).c_str(), "rb");
     uint16_t read = 0;
     uint32_t in_seqNum = 1;
 

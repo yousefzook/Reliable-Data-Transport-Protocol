@@ -16,7 +16,11 @@ public:
     int const timeout = 500; //time out after 500 ms
 
     int N = 1; // window size
-
+    FILE *fp;
+    int seqNo;
+    uint32_t nextSeqNo;
+    char buff[MAX_DATA_LEN];
+    int base;
     clock_t *timer;
     Packet **packets;
     bool *acked;
@@ -27,6 +31,8 @@ public:
 
     void sendPKT(Packet *pkt);
 
+    void initSender(int soc, struct sockaddr_in addr, string fileName);
+    void sendFile(int soc, struct sockaddr_in addr, string fileName);
     /**
      * next 3 functions are for congestion control purpose
      */

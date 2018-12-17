@@ -18,6 +18,7 @@ public:
     void handleReciever(int soc, struct sockaddr_in addr, string fileName) override;
     void handleSender(int soc, struct sockaddr_in addr, string fileName) override;
 
+//    char checkSum(char data[]);
 };
 
 
