@@ -4,6 +4,8 @@
 
 
 #include <SR.h>
+#include <GBN.h>
+#include <Server.h>
 #include "Client.h"
 #include "../rdt/StopNWait.h"
 
@@ -45,7 +47,7 @@ int Client::sendFileName(string fileName) {
     if (result < 0)
         cout << "Sending file failed!" << endl;
     else
-        cout << fileName << " sent successfully" << endl;
+        cout << fileName << " request sent successfully" << endl;
     return result;
 }
 
@@ -61,6 +63,6 @@ void Client::startClient(string hostName, int portNumber, string fileName) {
 int main(){
     Client *c = new Client();
     c->setRDT(new SR());
-    string fileName = "test.txt";
+    string fileName = "2";
     c->startClient(HOST_NAME, CLIENT_PORT_NUM, fileName);
 }

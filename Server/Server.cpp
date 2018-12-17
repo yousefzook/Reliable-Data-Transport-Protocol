@@ -4,6 +4,7 @@
 
 
 #include <SR.h>
+#include <GBN.h>
 #include "Server.h"
 #include "../rdt/RDT.h"
 #include "../rdt/StopNWait.h"
@@ -49,6 +50,7 @@ string Server::rcvFileName() {
     n = recvfrom(sockfd, (char *) buffer, MAX_LINE,MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
     buffer[n] = '\0';
     string message = buffer;
+    cout << "received file name: " << message << endl;
     rdt->handleSender(sockfd, cli_addr, message);
     return message;
 }
@@ -65,5 +67,4 @@ int main() {
     Server *server = new Server();
     server->setRDT(new SR());
     server->startServer(PORT_NUMBER);
-
 }

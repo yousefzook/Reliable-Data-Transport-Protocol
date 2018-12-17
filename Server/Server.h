@@ -24,7 +24,7 @@ class RDT;
 class Server {
 public:
     int sockfd;
-    uint32_t in_seqNum = 1;
+//    uint32_t in_seqNum = 1;
     struct sockaddr_in serv_addr;
 
     /**

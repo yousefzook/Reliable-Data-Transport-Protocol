@@ -4,10 +4,12 @@
 CMakeFiles/Client.dir/Client/Client.cpp.o: ../Packet/AckPacket.h
 CMakeFiles/Client.dir/Client/Client.cpp.o: ../Packet/DataPacket.h
 CMakeFiles/Client.dir/Client/Client.cpp.o: ../Packet/Packet.h
+CMakeFiles/Client.dir/Client/Client.cpp.o: ../Server/Server.h
+CMakeFiles/Client.dir/Client/Client.cpp.o: ../rdt/GBN.h
+CMakeFiles/Client.dir/Client/Client.cpp.o: ../rdt/RDT.h
+CMakeFiles/Client.dir/Client/Client.cpp.o: ../rdt/SR.h
 CMakeFiles/Client.dir/Client/Client.cpp.o: ../Client/Client.cpp
 CMakeFiles/Client.dir/Client/Client.cpp.o: ../Client/Client.h
-CMakeFiles/Client.dir/Client/Client.cpp.o: ../Packet/Packet.h
-CMakeFiles/Client.dir/Client/Client.cpp.o: ../rdt/RDT.h
 CMakeFiles/Client.dir/Client/Client.cpp.o: ../rdt/StopNWait.h
 
 CMakeFiles/Client.dir/Packet/AckPacket.cpp.o: ../Packet/AckPacket.cpp

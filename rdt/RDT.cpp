@@ -16,6 +16,8 @@ void RDT::handleSender(int soc, struct sockaddr_in addr, string fileName) {
 void RDT::sendUDP(Packet *p, int soc, struct sockaddr_in addr, int len){
     if (!isLoss()) {
         sendto(soc, p, len, MSG_CONFIRM, (const struct sockaddr *) &addr, sizeof(addr));
+    }else{
+        cout << "packet with sequence number is lost:"<< p->seqno <<endl;
     }
 }
 
@@ -24,16 +26,21 @@ int RDT::rcvUDP(Packet *p, int soc, struct sockaddr_in addr, int len, bool wait)
 
     if (wait) {
         struct timeval timeout;
-        timeout.tv_sec = 10;
-        timeout.tv_usec = 0;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 100000;
         setsockopt(soc, SOL_SOCKET, SO_RCVTIMEO, (char *) &timeout, sizeof(timeout));
     }
     return recvfrom(soc, p, len, MSG_WAITALL, (struct sockaddr *) &addr, &lenAddr);
 }
 
-bool RDT::isLoss() { // prob = 0.1
-    int min = 1, max = 10;
+bool RDT::isLoss() {
     srand(time(0));
-    int randNum = rand() % (max - min + 1) + min;
-    return randNum % 10 == 0;
+    int randNum = rand() % 100 + 1;
+    int prob = 1; // this number is the probability to make loss, from 0 to 100
+    if (randNum <= prob){
+        cout << "here" << endl;
+        return true;
+    }
+    else
+        return false;
 }

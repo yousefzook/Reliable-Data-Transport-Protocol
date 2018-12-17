@@ -5,10 +5,12 @@ CMakeFiles/Client.dir/Client/Client.cpp.o
  ../Packet/AckPacket.h
  ../Packet/DataPacket.h
  ../Packet/Packet.h
+ ../Server/Server.h
+ ../rdt/GBN.h
+ ../rdt/RDT.h
+ ../rdt/SR.h
  /home/zook/CLionProjects/TCP Network/Client/Client.cpp
  /home/zook/CLionProjects/TCP Network/Client/Client.h
- /home/zook/CLionProjects/TCP Network/Packet/Packet.h
- /home/zook/CLionProjects/TCP Network/rdt/RDT.h
  /home/zook/CLionProjects/TCP Network/rdt/StopNWait.h
 CMakeFiles/Client.dir/Packet/AckPacket.cpp.o
  /home/zook/CLionProjects/TCP Network/Packet/AckPacket.cpp

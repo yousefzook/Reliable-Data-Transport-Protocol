@@ -15,6 +15,9 @@ CMakeFiles/Server.dir/Packet/Packet.cpp.o: ../Packet/Packet.h
 CMakeFiles/Server.dir/Server/Server.cpp.o: ../Packet/AckPacket.h
 CMakeFiles/Server.dir/Server/Server.cpp.o: ../Packet/DataPacket.h
 CMakeFiles/Server.dir/Server/Server.cpp.o: ../Packet/Packet.h
+CMakeFiles/Server.dir/Server/Server.cpp.o: ../rdt/GBN.h
+CMakeFiles/Server.dir/Server/Server.cpp.o: ../rdt/RDT.h
+CMakeFiles/Server.dir/Server/Server.cpp.o: ../rdt/SR.h
 CMakeFiles/Server.dir/Server/Server.cpp.o: ../Packet/Packet.h
 CMakeFiles/Server.dir/Server/Server.cpp.o: ../Server/Server.cpp
 CMakeFiles/Server.dir/Server/Server.cpp.o: ../Server/Server.h

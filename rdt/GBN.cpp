@@ -12,10 +12,12 @@ void GBN::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
 
     FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
     uint32_t expectedSeqNo = 0; // expected seqno
-
+    int temp = 0;
     do {
         Packet *dataPkt = new DataPacket();
         rcvUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN, false);
+        temp += dataPkt->len;
+        cout << temp << endl;
         if (dataPkt->len == 0) // end of file
             break;
         if (dataPkt->seqno == expectedSeqNo) { // send ack and write packet
@@ -53,10 +55,9 @@ void GBN::handleSender(int soc, struct sockaddr_in addr, string fileName) {
         sendPKT(buff, read, nextSeqNo, soc, addr);
         nextSeqNo++;
     }
-//    timer = clock(); // start timer
 
     // if there are other packets to send
-    while ((read = fread(buff, 1, sizeof(buff), fp)) >= 0) {
+    while ((read = fread(buff, 1, sizeof(buff), fp)) > 0) {
         while (1) {
             Packet *ackPkt = new AckPacket();
             int res = rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN, true);
@@ -102,34 +103,5 @@ void GBN::sendPKT(char data[], uint16_t len, int seqNo, int soc, struct sockaddr
     dataPkt->seqno = seqNo;
     strcpy(((DataPacket *) dataPkt)->data, data);
     packets[seqNo % N] = dataPkt;
-    sendUDP(dataPkt, soc, addr, sizeof(*dataPkt));
+    sendUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN);
 }
-
-//
-//void timerFn(GBN *gbn) {
-//    while (1) {
-//        bool isFinished = true;
-//        for (int i = 0; i < gbn->N; i++) {
-//            mtx1.lock();
-//            if (sr->timer[i] == -1) {
-//                mtx1.unlock();
-//                continue;
-//            }
-//            isFinished = false; // there are some pkts not acked yet
-//            double time = (clock() - sr->timer[i]) / (CLOCKS_PER_SEC / 1000);
-//            if (!sr->acked[i] && time > sr->timeout) { // timeout, resend
-//                mtx2.lock();
-//                sr->sendPKT(sr->packets[i]);
-//                mtx2.unlock();
-//                sr->timer[i] = clock(); // restart timer
-//                sr->decreaseN();
-//                goto RECHECK;
-////                isFinished = true; // exit the thread
-////                break;
-//            }
-//            mtx1.unlock();
-//        }
-//        if (isFinished)
-//            break;
-//    }
-//}

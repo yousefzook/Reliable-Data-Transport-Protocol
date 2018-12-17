@@ -16,6 +16,9 @@ CMakeFiles/Server.dir/Server/Server.cpp.o
  ../Packet/AckPacket.h
  ../Packet/DataPacket.h
  ../Packet/Packet.h
+ ../rdt/GBN.h
+ ../rdt/RDT.h
+ ../rdt/SR.h
  /home/zook/CLionProjects/TCP Network/Packet/Packet.h
  /home/zook/CLionProjects/TCP Network/Server/Server.cpp
  /home/zook/CLionProjects/TCP Network/Server/Server.h

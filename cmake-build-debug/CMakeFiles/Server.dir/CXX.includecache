@@ -18,6 +18,32 @@ Packet.h
 cstdint
 -
 
+../rdt/GBN.h
+RDT.h
+../rdt/RDT.h
+
+../rdt/RDT.h
+stdio.h
+-
+iostream
+-
+unistd.h
+-
+stdlib.h
+-
+netinet/in.h
+-
+string
+-
+../Packet/Packet.h
+../Packet/Packet.h
+
+../rdt/SR.h
+vector
+-
+RDT.h
+../rdt/RDT.h
+
 /home/zook/CLionProjects/TCP Network/Packet/AckPacket.cpp
 AckPacket.h
 /home/zook/CLionProjects/TCP Network/Packet/AckPacket.h
@@ -45,6 +71,10 @@ cstdint
 -
 
 /home/zook/CLionProjects/TCP Network/Server/Server.cpp
+SR.h
+-
+GBN.h
+-
 Server.h
 /home/zook/CLionProjects/TCP Network/Server/Server.h
 ../rdt/RDT.h
@@ -125,6 +155,12 @@ mutex
 -
 SR.h
 /home/zook/CLionProjects/TCP Network/rdt/SR.h
+ctime
+-
+chrono
+-
+ratio
+-
 
 /home/zook/CLionProjects/TCP Network/rdt/SR.h
 vector
@@ -135,6 +171,12 @@ RDT.h
 /home/zook/CLionProjects/TCP Network/rdt/StopNWait.cpp
 StopNWait.h
 /home/zook/CLionProjects/TCP Network/rdt/StopNWait.h
+ctime
+-
+ratio
+-
+chrono
+-
 
 /home/zook/CLionProjects/TCP Network/rdt/StopNWait.h
 cstring

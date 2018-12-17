@@ -3,11 +3,18 @@
 //
 
 #include "StopNWait.h"
+#include <ctime>
+#include <ratio>
+#include <chrono>
+using namespace std::chrono;
+
 
 StopNWait::StopNWait() {
 }
 
 void StopNWait::handleReciever(int soc, struct sockaddr_in addr, string fileName) {
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
     FILE *fp = fopen(("../Client/" + fileName).c_str(), "w");
     uint16_t in_seqNum = 1;
     Packet *dataPkt;
@@ -25,6 +32,9 @@ void StopNWait::handleReciever(int soc, struct sockaddr_in addr, string fileName
     } while (dataPkt->len > 0);
     fflush(fp);
     fclose(fp);
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    cout << "Recieving time: " << time_span.count() << endl;
 }
 
 void StopNWait::handleSender(int soc, struct sockaddr_in addr, string fileName) {
@@ -40,7 +50,7 @@ void StopNWait::handleSender(int soc, struct sockaddr_in addr, string fileName) 
         dataPkt->seqno = in_seqNum;
         strcpy(((DataPacket *) dataPkt)->data, buff);
         RESEND:
-        sendUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN); //todo send with probablity
+        sendUDP(dataPkt, soc, addr, MAX_DATA_PACKET_LEN);
         Packet *ackPkt = new AckPacket();
         if (rcvUDP(ackPkt, soc, addr, MAX_ACK_PACKET_LEN, true) == -1) {
             goto RESEND; // to handle time out;
