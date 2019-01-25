@@ -18,7 +18,7 @@ make
 cd cmake-build-debug
 ./Server 
 ```
-open new rerminal
+open new terminal
 ```C
 cd cmake-build-debug
 ./Client 
